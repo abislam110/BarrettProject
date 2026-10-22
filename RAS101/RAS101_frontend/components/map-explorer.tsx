@@ -22,14 +22,23 @@ async function fetchPins(url: string): Promise<BuildingLocation[]> {
  * query, open panorama, pin placement) and wires the sidebar and map together.
  * Pins are loaded from the database via SWR, seeded by the server render.
  */
-export function MapExplorer({ building: initialBuilding }: { building: Building }) {
+export function MapExplorer({
+  building: initialBuilding,
+  defaultMapImage,
+  initialMapImage,
+}: {
+  building: Building
+  defaultMapImage: string
+  initialMapImage: string
+}) {
   const { data: locations = initialBuilding.locations, mutate } = useSWR(PINS_KEY, fetchPins, {
     fallbackData: initialBuilding.locations,
     revalidateOnMount: false,
   })
+  const [mapImage, setMapImage] = useState(initialMapImage)
   const building = useMemo(
-    () => ({ ...initialBuilding, locations }),
-    [initialBuilding, locations],
+    () => ({ ...initialBuilding, locations, mapImage }),
+    [initialBuilding, locations, mapImage],
   )
 
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -120,6 +129,8 @@ export function MapExplorer({ building: initialBuilding }: { building: Building 
           isPlacing={isAdding}
           draft={draft}
           onPlace={setDraft}
+          isCustomBackground={mapImage !== defaultMapImage}
+          onBackgroundChange={(url) => setMapImage(url ?? defaultMapImage)}
         />
       </div>
 

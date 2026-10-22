@@ -10,6 +10,7 @@ import { Minus, Plus, Maximize2, MapPin as MapPinIcon } from 'lucide-react'
 import { CATEGORY_META, CATEGORY_ORDER } from '@/lib/categories'
 import type { Building, MapCoordinates } from '@/lib/types'
 import { MapMarker } from './map-marker'
+import { BackgroundControl } from './background-control'
 
 interface MapCanvasProps {
   building: Building
@@ -18,6 +19,8 @@ interface MapCanvasProps {
   isPlacing: boolean
   draft: MapCoordinates | null
   onPlace: (coordinates: MapCoordinates) => void
+  isCustomBackground: boolean
+  onBackgroundChange: (url: string | null) => void
 }
 
 /** Pointer movement (px) beyond which a press is treated as a pan, not a click. */
@@ -35,6 +38,8 @@ export function MapCanvas({
   isPlacing,
   draft,
   onPlace,
+  isCustomBackground,
+  onBackgroundChange,
 }: MapCanvasProps) {
   const [scale, setScale] = useState(1)
   const transformRef = useRef<ReactZoomPanPinchRef | null>(null)
@@ -169,6 +174,16 @@ export function MapCanvas({
             >
               <Maximize2 className="h-4.5 w-4.5" />
             </button>
+
+            {!isPlacing && (
+              <BackgroundControl
+                isCustom={isCustomBackground}
+                onChange={(url) => {
+                  onBackgroundChange(url)
+                  resetTransform()
+                }}
+              />
+            )}
           </>
         )}
       </TransformWrapper>
