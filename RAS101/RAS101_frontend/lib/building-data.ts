@@ -17,7 +17,7 @@ import type { Building } from './types'
  */
 
 const PANORAMA_STANDIN =
-  'https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg'
+  '/maps/img1.jpg'
 
 const VIDEO_STANDIN_A =
   'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
@@ -26,66 +26,19 @@ const VIDEO_STANDIN_B =
 
 export const building: Building = {
   id: 'innovation-hall',
-  name: 'Innovation Hall',
-  address: '742 Maker Avenue · Floor 1',
+  name: 'Room 212',
+  address: 'Poly ISTB12 · Floor 2',
   mapImage: '/maps/building-floorplan.png',
   locations: [
     {
       id: 'main-entrance',
-      name: 'Main Entrance',
-      category: 'entrance',
-      description:
-        'The primary street-level entrance. Accessible ramp on the east side and a covered drop-off zone directly out front.',
-      coordinates: { x: 50, y: 91 },
-      panoramaUrl: PANORAMA_STANDIN,
-    },
-    {
-      id: 'lobby',
-      name: 'Main Lobby',
+      name: 'RAS Lab 1',
       category: 'room',
       description:
-        'Double-height reception area with the welcome desk, visitor check-in kiosks, and seating. Start any tour here.',
-      coordinates: { x: 50, y: 66 },
-      thumbnail: '/thumbnails/lobby.png',
-      panoramaUrl: PANORAMA_STANDIN,
-      videoUrl: VIDEO_STANDIN_A,
+        'The Robotics Lab 1',
+      coordinates: { x: 80, y: 15 },
+      panoramaUrl: '/maps/img1.jpg',
     },
-    {
-      id: 'auditorium',
-      name: 'Grand Auditorium',
-      category: 'room',
-      description:
-        '220-seat auditorium used for keynotes and all-hands. Equipped with a full AV rig and a live-stream booth.',
-      coordinates: { x: 24, y: 44 },
-      videoUrl: VIDEO_STANDIN_B,
-    },
-    {
-      id: 'cafe',
-      name: 'Corner Café',
-      category: 'amenity',
-      description:
-        'Coffee bar and grab-and-go counter. Open 7am–4pm on weekdays. Seating spills into the adjacent courtyard.',
-      coordinates: { x: 73, y: 39 },
-      panoramaUrl: PANORAMA_STANDIN,
-    },
-    {
-      id: 'innovation-lab',
-      name: 'Innovation Lab',
-      category: 'facility',
-      description:
-        'Hardware prototyping lab with 3D printers, a laser cutter, and electronics benches. Badge access required.',
-      coordinates: { x: 39, y: 24 },
-      panoramaUrl: PANORAMA_STANDIN,
-      videoUrl: VIDEO_STANDIN_A,
-    },
-    {
-      id: 'courtyard',
-      name: 'Central Courtyard',
-      category: 'outdoor',
-      description:
-        'Landscaped open-air courtyard at the heart of the building. A quiet spot for breaks and informal meetings.',
-      coordinates: { x: 82, y: 71 },
-      panoramaUrl: PANORAMA_STANDIN,
-    },
+
   ],
 }

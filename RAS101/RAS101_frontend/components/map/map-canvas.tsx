@@ -6,7 +6,13 @@ import {
   TransformWrapper,
   type ReactZoomPanPinchRef,
 } from 'react-zoom-pan-pinch'
-import { Minus, Plus, Maximize2 } from 'lucide-react'
+import { 
+          Minus, 
+          Plus, 
+          Maximize2,
+          ChevronLeft,
+          ChevronRight,
+} from 'lucide-react'
 import { CATEGORY_META, CATEGORY_ORDER } from '@/lib/categories'
 import type { Building } from '@/lib/types'
 import { MapMarker } from './map-marker'
@@ -33,7 +39,22 @@ export function MapCanvas({ building, selectedId, onSelect }: MapCanvasProps) {
       transformRef.current.zoomToElement(node, 2.2, 500)
     }
   }, [selectedId])
+const currentIndex = building.locations.findIndex(
+  (location) => location.id === selectedId
+)
 
+const navigateLocation = (direction: -1 | 1) => {
+  const locations = building.locations
+
+  if (locations.length === 0) return
+
+  // If nothing is selected, start at the first location.
+  const startIndex = currentIndex === -1 ? 0 : currentIndex
+  const nextIndex =
+    (startIndex + direction + locations.length) % locations.length
+
+  onSelect(locations[nextIndex].id)
+}
   return (
     <div className="relative h-full w-full overflow-hidden bg-muted">
       <TransformWrapper
@@ -45,7 +66,7 @@ export function MapCanvas({ building, selectedId, onSelect }: MapCanvasProps) {
         limitToBounds={false}
         doubleClick={{ step: 0.7 }}
         wheel={{ step: 0.12 }}
-        onTransformed={(_ref, state) => setScale(state.scale)}
+        onTransform={(_ref, state) => setScale(state.scale)}
       >
         {({ zoomIn, zoomOut, resetTransform }) => (
           <>
@@ -77,7 +98,28 @@ export function MapCanvas({ building, selectedId, onSelect }: MapCanvasProps) {
             </TransformComponent>
 
             <MapLegend />
+{/* Previous / next location */}
+<div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 gap-2">
+  <button
+    type="button"
+    onClick={() => navigateLocation(-1)}
+    aria-label="Previous location"
+    disabled={building.locations.length === 0}
+    className="flex h-11 w-11 items-center justify-center rounded-full bg-card text-card-foreground shadow-lg ring-1 ring-border transition-colors hover:bg-accent disabled:opacity-50"
+  >
+    <ChevronLeft className="h-5 w-5" />
+  </button>
 
+  <button
+    type="button"
+    onClick={() => navigateLocation(1)}
+    aria-label="Next location"
+    disabled={building.locations.length === 0}
+    className="flex h-11 w-11 items-center justify-center rounded-full bg-card text-card-foreground shadow-lg ring-1 ring-border transition-colors hover:bg-accent disabled:opacity-50"
+  >
+    <ChevronRight className="h-5 w-5" />
+  </button>
+</div>    
             {/* Zoom controls */}
             <div className="absolute bottom-6 right-4 flex flex-col overflow-hidden rounded-lg bg-card shadow-lg ring-1 ring-border">
               <button
