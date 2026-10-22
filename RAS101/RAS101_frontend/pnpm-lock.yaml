@@ -14,6 +14,9 @@ importers:
       '@photo-sphere-viewer/core':
         specifier: ^5.15.1
         version: 5.15.1
+      '@photo-sphere-viewer/markers-plugin':
+        specifier: ^5.15.1
+        version: 5.15.1(@photo-sphere-viewer/core@5.15.1)
       '@vercel/analytics':
         specifier: 1.6.1
         version: 1.6.1(next@16.3.3(@babel/core@7.29.7)(@types/node@24.10.4)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
@@ -545,6 +548,11 @@ packages:
 
   '@photo-sphere-viewer/core@5.15.1':
     resolution: {integrity: sha512-nhJviczUB1xiAT/I7mGba9iDIw7DvsiK34hbR9t7kIrg9MySG33uA+a4QUk2dEOP5PjcKMj58wod8I/dQ7ePiw==}
+
+  '@photo-sphere-viewer/markers-plugin@5.15.1':
+    resolution: {integrity: sha512-57WiHy8fcQfwid9x07ADiQJGxzcFxclbR2yIqeggzfPDguwJlCKwX5tj8brTRqwouUiHpkb80QWxHByxt45LcA==}
+    peerDependencies:
+      '@photo-sphere-viewer/core': 5.15.1
 
   '@sec-ant/readable-stream@0.4.1':
     resolution: {integrity: sha512-831qok9r2t8AlxLko40y2ebgSDhenenCatLVeW/uBtnHPyhHOvG0C7TvfgecV+wHzIm5KUICgzmVpWS+IMEAeg==}
@@ -2362,6 +2370,10 @@ snapshots:
   '@photo-sphere-viewer/core@5.15.1':
     dependencies:
       three: 0.185.1
+
+  '@photo-sphere-viewer/markers-plugin@5.15.1(@photo-sphere-viewer/core@5.15.1)':
+    dependencies:
+      '@photo-sphere-viewer/core': 5.15.1
 
   '@sec-ant/readable-stream@0.4.1': {}
 
