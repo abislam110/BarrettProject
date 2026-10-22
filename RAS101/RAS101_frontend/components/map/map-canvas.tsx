@@ -6,25 +6,56 @@ import {
   TransformWrapper,
   type ReactZoomPanPinchRef,
 } from 'react-zoom-pan-pinch'
-import { Minus, Plus, Maximize2 } from 'lucide-react'
+import { Minus, Plus, Maximize2, MapPin as MapPinIcon } from 'lucide-react'
 import { CATEGORY_META, CATEGORY_ORDER } from '@/lib/categories'
-import type { Building } from '@/lib/types'
+import type { Building, MapCoordinates } from '@/lib/types'
 import { MapMarker } from './map-marker'
 
 interface MapCanvasProps {
   building: Building
   selectedId: string | null
   onSelect: (id: string) => void
+  isPlacing: boolean
+  draft: MapCoordinates | null
+  onPlace: (coordinates: MapCoordinates) => void
 }
+
+/** Pointer movement (px) beyond which a press is treated as a pan, not a click. */
+const CLICK_TOLERANCE = 5
 
 /**
  * The interactive map surface: a pannable / zoomable map image with pins.
  * Selecting a location (from here or the sidebar) smoothly zooms to its pin.
+ * In placement mode, clicking the map drops a draft pin at that spot.
  */
-export function MapCanvas({ building, selectedId, onSelect }: MapCanvasProps) {
+export function MapCanvas({
+  building,
+  selectedId,
+  onSelect,
+  isPlacing,
+  draft,
+  onPlace,
+}: MapCanvasProps) {
   const [scale, setScale] = useState(1)
   const transformRef = useRef<ReactZoomPanPinchRef | null>(null)
   const markerRefs = useRef<Record<string, HTMLButtonElement | null>>({})
+  const pointerStart = useRef<{ x: number; y: number } | null>(null)
+
+  function handlePlaceClick(event: React.MouseEvent<HTMLDivElement>) {
+    if (!isPlacing) return
+    const start = pointerStart.current
+    if (
+      start &&
+      Math.hypot(event.clientX - start.x, event.clientY - start.y) > CLICK_TOLERANCE
+    ) {
+      return
+    }
+    const rect = event.currentTarget.getBoundingClientRect()
+    const x = ((event.clientX - rect.left) / rect.width) * 100
+    const y = ((event.clientY - rect.top) / rect.height) * 100
+    if (x < 0 || x > 100 || y < 0 || y > 100) return
+    onPlace({ x, y })
+  }
 
   useEffect(() => {
     if (!selectedId) return
@@ -45,7 +76,7 @@ export function MapCanvas({ building, selectedId, onSelect }: MapCanvasProps) {
         limitToBounds={false}
         doubleClick={{ step: 0.7 }}
         wheel={{ step: 0.12 }}
-        onTransformed={(_ref, state) => setScale(state.scale)}
+        onTransform={(_ref, state) => setScale(state.scale)}
       >
         {({ zoomIn, zoomOut, resetTransform }) => (
           <>
@@ -53,7 +84,13 @@ export function MapCanvas({ building, selectedId, onSelect }: MapCanvasProps) {
               wrapperStyle={{ width: '100%', height: '100%' }}
               contentStyle={{ width: '100%', height: '100%' }}
             >
-              <div className="relative w-full">
+              <div
+                className={`relative w-full ${isPlacing ? 'cursor-crosshair' : ''}`}
+                onPointerDown={(e) => {
+                  pointerStart.current = { x: e.clientX, y: e.clientY }
+                }}
+                onClick={handlePlaceClick}
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={building.mapImage || '/placeholder.svg'}
@@ -70,11 +107,36 @@ export function MapCanvas({ building, selectedId, onSelect }: MapCanvasProps) {
                     location={location}
                     inverseScale={1 / scale}
                     selected={selectedId === location.id}
-                    onSelect={() => onSelect(location.id)}
+                    onSelect={() => {
+                      if (!isPlacing) onSelect(location.id)
+                    }}
                   />
                 ))}
+                {isPlacing && draft && (
+                  <div
+                    className="pointer-events-none absolute"
+                    style={{
+                      left: `${draft.x}%`,
+                      top: `${draft.y}%`,
+                      transform: `translate(-50%, -100%) scale(${1 / scale})`,
+                      transformOrigin: 'bottom center',
+                    }}
+                    aria-hidden="true"
+                  >
+                    <MapPinIcon className="h-9 w-9 animate-bounce fill-primary text-primary-foreground drop-shadow-lg" />
+                  </div>
+                )}
               </div>
             </TransformComponent>
+
+            {isPlacing && (
+              <div
+                role="status"
+                className="pointer-events-none absolute left-1/2 top-4 -translate-x-1/2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-lg"
+              >
+                {draft ? 'Click again to move the pin' : 'Click the map to place a pin'}
+              </div>
+            )}
 
             <MapLegend />
 

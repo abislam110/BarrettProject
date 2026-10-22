@@ -1,6 +1,7 @@
 'use client'
 
-import { ArrowLeft, View } from 'lucide-react'
+import { useState } from 'react'
+import { ArrowLeft, Loader2, Trash2, View } from 'lucide-react'
 import { CATEGORY_META } from '@/lib/categories'
 import type { BuildingLocation } from '@/lib/types'
 import { VideoPlayer } from '@/components/media/video-player'
@@ -10,14 +11,29 @@ interface LocationDetailProps {
   location: BuildingLocation
   onBack: () => void
   onOpenPanorama: (location: BuildingLocation) => void
+  onDelete: (id: string) => Promise<void>
 }
 
-export function LocationDetail({ location, onBack, onOpenPanorama }: LocationDetailProps) {
+export function LocationDetail({ location, onBack, onOpenPanorama, onDelete }: LocationDetailProps) {
   const meta = CATEGORY_META[location.category]
+  const [confirming, setConfirming] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleDelete() {
+    setDeleting(true)
+    setError(null)
+    try {
+      await onDelete(location.id)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not delete pin')
+      setDeleting(false)
+    }
+  }
 
   return (
     <div className="flex flex-col">
-      <div className="sticky top-0 z-10 border-b border-border bg-sidebar px-4 py-3">
+      <div className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-border bg-sidebar px-4 py-3">
         <button
           type="button"
           onClick={onBack}
@@ -26,7 +42,38 @@ export function LocationDetail({ location, onBack, onOpenPanorama }: LocationDet
           <ArrowLeft className="h-4 w-4" />
           All locations
         </button>
+        {confirming ? (
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-muted-foreground">Delete pin?</span>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setConfirming(false)}
+              disabled={deleting}
+            >
+              Cancel
+            </Button>
+            <Button size="sm" variant="destructive" onClick={handleDelete} disabled={deleting}>
+              {deleting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              Delete
+            </Button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setConfirming(true)}
+            aria-label={`Delete ${location.name}`}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-destructive"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        )}
       </div>
+      {error && (
+        <p role="alert" className="px-4 pt-3 text-sm text-destructive">
+          {error}
+        </p>
+      )}
 
       {/* Hero */}
       <div className="relative aspect-video w-full bg-muted">
