@@ -1,19 +1,23 @@
 'use client'
 
-import { ArrowLeft, View } from 'lucide-react'
+import { useState } from 'react'
+import Link from 'next/link'
+import { ArrowLeft, Trash2, View } from 'lucide-react'
 import { CATEGORY_META } from '@/lib/categories'
 import type { BuildingLocation } from '@/lib/types'
 import { VideoPlayer } from '@/components/media/video-player'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 interface LocationDetailProps {
   location: BuildingLocation
   onBack: () => void
-  onOpenPanorama: (location: BuildingLocation) => void
+  onDelete: (id: string) => void
 }
 
-export function LocationDetail({ location, onBack, onOpenPanorama }: LocationDetailProps) {
+export function LocationDetail({ location, onBack, onDelete }: LocationDetailProps) {
   const meta = CATEGORY_META[location.category]
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
 
   return (
     <div className="flex flex-col">
@@ -65,15 +69,14 @@ export function LocationDetail({ location, onBack, onOpenPanorama }: LocationDet
           {location.description}
         </p>
 
-        {location.panoramaUrl && (
-          <Button
-            onClick={() => onOpenPanorama(location)}
-            className="w-full gap-2"
-            size="lg"
+        {location.tourSceneId && (
+          <Link
+            href={`/tour?scene=${encodeURIComponent(location.tourSceneId)}`}
+            className={cn(buttonVariants({ size: 'lg' }), 'h-11 w-full gap-2')}
           >
             <View className="h-4 w-4" />
             View 360°
-          </Button>
+          </Link>
         )}
 
         {location.videoUrl && (
@@ -86,6 +89,43 @@ export function LocationDetail({ location, onBack, onOpenPanorama }: LocationDet
             />
           </div>
         )}
+
+        {/* Destructive action, separated from the rest of the content */}
+        <div className="mt-2 border-t border-border pt-4">
+          {confirmingDelete ? (
+            <div className="flex flex-col gap-2">
+              <p className="text-sm font-medium text-foreground">
+                Delete “{location.name}”?
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="destructive"
+                  className="flex-1 gap-2"
+                  onClick={() => onDelete(location.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Delete pin
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setConfirmingDelete(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Button
+              variant="ghost"
+              className="w-full gap-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
+              onClick={() => setConfirmingDelete(true)}
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete pin
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   )
