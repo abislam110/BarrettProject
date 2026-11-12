@@ -55,6 +55,10 @@ Building locations, map coordinates, panorama scenes, navigation arrows, and hot
 
 Panorama images and other media are stored in the project's `public` directory.
 
+NOTE: components/tour/tour-explorer.tsx lines 160-199 can be deleted to get rid of the black bar of "pseudo" locations when going through the tour. They're helpful to keep in case you need to go back to a certain image to change some properties.
+
 ## Contributing
+
+
 
 Fork the repository, create a branch for your changes, and submit a pull request when your work is ready for review.
