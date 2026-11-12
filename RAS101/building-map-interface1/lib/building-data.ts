@@ -29,80 +29,34 @@ import type { Building } from './types'
  */
 export const building: Building = {
   id: 'innovation-hall',
-  name: 'Innovation Hall',
-  address: '742 Maker Avenue - Floor 1',
+  name: 'Second Floor',
+  address: 'Poly ISTB12',
   mapImage: '/maps/building-floorplan.png',
   locations: [
+    
     {
-      id: 'main-entrance',
-      name: 'Main Entrance',
-      category: 'entrance',
-      description:
-        'The primary street-level entrance. Accessible ramp on the east side and a covered drop-off zone directly out front.',
-      coordinates: { x: 50, y: 91 },
-      tourSceneId: 'lobby',
-    },
-    {
-      id: 'lobby',
-      name: 'Main Lobby',
+      id: 'lab-room-212',
+      name: 'Lab Room 212',
       category: 'room',
       description:
-        'Double-height reception area with the welcome desk, visitor check-in kiosks, and seating. Start any tour here.',
-      coordinates: { x: 50, y: 66 },
-      thumbnail: '/thumbnails/lobby.png',
+        'Lab room used by robotics & manufacturing students',
+      coordinates: { x: 57, y: 17 },
+      thumbnail: '',
       tourSceneId: 'lobby',
       videoUrl:
         'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
     },
-    {
-      id: 'auditorium',
-      name: 'Grand Auditorium',
-      category: 'room',
-      description:
-        '220-seat auditorium used for keynotes and all-hands. Equipped with a full AV rig and a live-stream booth.',
-      coordinates: { x: 24, y: 44 },
-      tourSceneId: 'classroom',
-      videoUrl:
-        'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-    },
-    {
-      id: 'cafe',
-      name: 'Corner Cafe',
-      category: 'amenity',
-      description:
-        'Coffee bar and grab-and-go counter. Open 7am-4pm on weekdays. Seating spills into the adjacent courtyard.',
-      coordinates: { x: 73, y: 39 },
-      tourSceneId: 'hallway',
-    },
-    {
-      id: 'innovation-lab',
-      name: 'Innovation Lab',
-      category: 'facility',
-      description:
-        'Hardware prototyping lab with 3D printers, a laser cutter, and electronics benches. Badge access required.',
-      coordinates: { x: 39, y: 24 },
-      tourSceneId: 'innovation-lab',
-      videoUrl:
-        'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-    },
-    {
-      id: 'courtyard',
-      name: 'Central Courtyard',
-      category: 'outdoor',
-      description:
-        'Landscaped open-air courtyard at the heart of the building. A quiet spot for breaks and informal meetings.',
-      coordinates: { x: 82, y: 71 },
-      tourSceneId: 'courtyard',
-    },
+    
   ],
   tour: {
     startSceneId: 'lobby',
     scenes: [
       {
         id: 'lobby',
-        name: 'Main Lobby',
+        name: 'Lab Room 1',
+        locationId: 'lab-room-212',
         image: '/panoramas/lobby.jpg',
-        coordinates: { x: 50, y: 66 },
+        coordinates: { x: 55, y: 17 },
         links: [
           { to: 'hallway', yaw: 310 },
           { to: 'courtyard', yaw: 220 },
@@ -111,42 +65,102 @@ export const building: Building = {
       {
         id: 'hallway',
         name: 'Hallway',
+        locationId: 'lab-room-212',
         image: '/panoramas/hallway.jpg',
-        coordinates: { x: 62, y: 45 },
+        coordinates: { x: 55, y: 10 },
         links: [
           { to: 'lobby', yaw: 130 },
           { to: 'classroom', yaw: 235 },
         ],
+  hotspots: [
+    {
+      id: 'franc-cobot',
+      title: 'FRANUC Cobot',
+      description:
+        'The FRANUC Cobot is a collaborative robot used in the lab for various tasks and demonstrations.',
+      yaw: 285,
+      pitch: 355,
+      image: '/thumbnails/lobby.png',
+    },
+  ],
       },
       {
         id: 'classroom',
         name: 'Classroom',
+        locationId: 'lab-room-212',
         image: '/panoramas/classroom.jpg',
-        coordinates: { x: 24, y: 44 },
+        coordinates: { x: 47, y: 10 },
         links: [
           { to: 'hallway', yaw: 50 },
           { to: 'innovation-lab', yaw: 235 },
         ],
+        
+  hotspots: [
+    {
+      id: 'unitree-robotic-dog',
+      title: 'Unitree Robotic Dog',
+      description:
+        'The Unitree Robotic Dog is a quadruped robot used in the lab for various tasks and demonstrations.',
+      yaw: 490,
+      pitch: 340,
+      videoUrl: '/thumbnails/unitreeRoboticDog.MOV',
+    },
+  ],
       },
       {
         id: 'innovation-lab',
         name: 'Innovation Lab',
+        locationId: 'lab-room-212',
         image: '/panoramas/innovation-lab.jpg',
-        coordinates: { x: 39, y: 24 },
+        coordinates: { x: 40, y: 10 },
         links: [
           { to: 'classroom', yaw: 330 },
           { to: 'courtyard', yaw: 20 },
         ],
+        hotspots: [
+    {
+      id: 'pentaMachine',
+      title: 'Penta CNC V2-10 Machine',
+      description:
+        'A precision CNC machine that runs on 5 axes used in the lab for various tasks and demonstrations. These machines can cut on wood, durin, and hard wax materials.',
+      yaw: 530,
+      pitch: 355,
+      image: '/thumbnails/pentaCNC.gif',
+    },
+  ],
       },
       {
         id: 'courtyard',
         name: 'Central Courtyard',
+        locationId: 'lab-room-212',
         image: '/panoramas/courtyard.jpg',
-        coordinates: { x: 82, y: 71 },
+        coordinates: { x: 47, y: 17 },
         links: [
           { to: 'innovation-lab', yaw: 217 },
           { to: 'lobby', yaw: 0 },
         ],
+        hotspots: [
+    {
+      id: 'cobots',
+      title: 'Cobots',
+      description:
+        'Collaborative robots used in the lab for various tasks and demonstrations.',
+      yaw: 240,
+      pitch: 355,
+      image: '',
+    },
+    
+    {
+      id: 'humanoid',
+      title: 'Humanoid Robot',
+      description:
+        'A humanoid robot used in the lab for various tasks and demonstrations.',
+      yaw: 280,
+      pitch: 355,
+      image: '',
+    },
+  ],
+  
       },
     ],
   },

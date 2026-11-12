@@ -77,6 +77,21 @@ export interface TourLink {
   pitch?: number
 }
 
+/** An interactive information point inside a 360° panorama. */
+export interface TourHotspot {
+  id: string
+  title: string
+  description: string
+  /** Horizontal position in degrees (0–360). */
+  yaw: number
+  /** Vertical position in degrees. */
+  pitch: number
+  /** Optional image displayed in the information popup. */
+  image?: string
+  /** Optional video displayed in the information popup. */
+  videoUrl?: string
+}
+
 /** One 360° photo in the walkable tour. */
 export interface TourScene {
   id: string
@@ -85,11 +100,14 @@ export interface TourScene {
   /** Equirectangular (2:1) image, e.g. `/panoramas/<id>.jpg`. */
   image: string
   /** Where this photo was taken on the map, for the tour minimap. */
+  locationId: string
   coordinates?: MapCoordinates
   /** Direction (degrees) the camera faces when the scene opens. */
   initialYaw?: number
   /** Arrows to neighbouring scenes. */
   links: TourLink[]
+  /** Interactive information points within this panorama. */
+hotspots?: TourHotspot[]
 }
 
 /** The walkable 360° tour: a graph of scenes connected by `links`. */

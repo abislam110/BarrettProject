@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
@@ -7,22 +8,21 @@ import '@photo-sphere-viewer/core/index.css'
 import '@photo-sphere-viewer/markers-plugin/index.css'
 import type { TourScene } from '@/lib/types'
 
-/** Arrows sit on the floor, like Street View, unless a link overrides it. */
 const DEFAULT_LINK_PITCH = -25
 const TRANSITION_MS = 1000
 
 interface PanoramaStageProps {
   scene: TourScene
-  /** Scene id → display name, used for arrow tooltips. */
   sceneNames: Record<string, string>
   onNavigate: (sceneId: string) => void
-  /** Current camera direction in degrees (0–360), same units as `TourLink.yaw`. */
+  onSelectHotspot: (hotspotId: string) => void
   onHeadingChange?: (degrees: number) => void
   onLoadingChange?: (loading: boolean) => void
   className?: string
 }
 
 const toRadians = (degrees: number) => (degrees * Math.PI) / 180
+
 const toDegrees = (radians: number) =>
   (((radians * 180) / Math.PI) % 360 + 360) % 360
 
@@ -31,17 +31,48 @@ function escapeHtml(value: string) {
 }
 
 function arrowHtml(label: string) {
-  return `<div class="tour-arrow" aria-label="Go to ${escapeHtml(label)}"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></div>`
+  return `<div class="tour-arrow" aria-label="Go to ${escapeHtml(label)}">
+    <svg viewBox="0 0 24 24" width="30" height="30" fill="none"
+      stroke="currentColor" stroke-width="3" stroke-linecap="round"
+      stroke-linejoin="round" aria-hidden="true">
+      <path d="m6 15 6-6 6 6"/>
+    </svg>
+  </div>`
 }
 
-function renderLinks(
+function hotspotHtml(title: string) {
+  return `<div
+    role="button"
+    aria-label="More information about ${escapeHtml(title)}"
+    style="
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: #2563eb;
+      color: white;
+      border: 3px solid white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.35);
+      cursor: pointer;
+      font-size: 23px;
+      font-weight: bold;
+    "
+  >i</div>`
+}
+
+function renderMarkers(
   markers: MarkersPlugin,
   scene: TourScene,
   sceneNames: Record<string, string>,
 ) {
   markers.clearMarkers()
+
+  // Existing navigation arrows
   scene.links.forEach((link, index) => {
     const label = sceneNames[link.to] ?? link.to
+
     markers.addMarker({
       id: `${scene.id}->${link.to}-${index}`,
       position: {
@@ -51,21 +82,35 @@ function renderLinks(
       html: arrowHtml(label),
       size: { width: 64, height: 64 },
       anchor: 'center center',
-      tooltip: { content: escapeHtml(label), position: 'top center' },
       data: { to: link.to },
+    })
+  })
+
+  // New information hotspots
+  scene.hotspots?.forEach((hotspot) => {
+    markers.addMarker({
+      id: `hotspot-${scene.id}-${hotspot.id}`,
+      position: {
+        yaw: toRadians(hotspot.yaw),
+        pitch: toRadians(hotspot.pitch),
+      },
+      html: hotspotHtml(hotspot.title),
+      size: { width: 42, height: 42 },
+      anchor: 'center center',
+      tooltip: {
+        content: escapeHtml(hotspot.title),
+        position: 'top center',
+      },
+      data: { hotspotId: hotspot.id },
     })
   })
 }
 
-/**
- * Imperative wrapper around Photo Sphere Viewer. The viewer is created once;
- * changing `scene` swaps the panorama with a fade and redraws the link arrows.
- * The library touches `window`, so it is imported lazily inside the effect.
- */
 export function PanoramaStage({
   scene,
   sceneNames,
   onNavigate,
+  onSelectHotspot,
   onHeadingChange,
   onLoadingChange,
   className,
@@ -76,10 +121,24 @@ export function PanoramaStage({
   const loadedSceneRef = useRef<string | null>(null)
   const [ready, setReady] = useState(false)
 
-  // Latest props for event handlers registered once at creation time.
-  const latest = useRef({ scene, sceneNames, onNavigate, onHeadingChange, onLoadingChange })
+  const latest = useRef({
+    scene,
+    sceneNames,
+    onNavigate,
+    onSelectHotspot,
+    onHeadingChange,
+    onLoadingChange,
+  })
+
   useEffect(() => {
-    latest.current = { scene, sceneNames, onNavigate, onHeadingChange, onLoadingChange }
+    latest.current = {
+      scene,
+      sceneNames,
+      onNavigate,
+      onSelectHotspot,
+      onHeadingChange,
+      onLoadingChange,
+    }
   })
 
   useEffect(() => {
@@ -91,9 +150,11 @@ export function PanoramaStage({
         import('@photo-sphere-viewer/core'),
         import('@photo-sphere-viewer/markers-plugin'),
       ])
+
       if (cancelled || !containerRef.current) return
 
       const initial = latest.current.scene
+
       viewer = new Viewer({
         container: containerRef.current,
         panorama: initial.image,
@@ -103,19 +164,33 @@ export function PanoramaStage({
         loadingTxt: 'Loading 360° scene…',
         plugins: [MarkersPlugin],
       })
+
       const markers = viewer.getPlugin<MarkersPlugin>(MarkersPlugin)
 
       markers.addEventListener('select-marker', ({ marker }) => {
         const to = marker.data?.to as string | undefined
-        if (to) latest.current.onNavigate(to)
+        const hotspotId = marker.data?.hotspotId as string | undefined
+
+        if (to) {
+          latest.current.onNavigate(to)
+        } else if (hotspotId) {
+          latest.current.onSelectHotspot(hotspotId)
+        }
       })
+
       viewer.addEventListener('position-updated', ({ position }) => {
         latest.current.onHeadingChange?.(toDegrees(position.yaw))
       })
+
       viewer.addEventListener(
         'ready',
         () => {
-          renderLinks(markers, latest.current.scene, latest.current.sceneNames)
+          renderMarkers(
+            markers,
+            latest.current.scene,
+            latest.current.sceneNames,
+          )
+
           loadedSceneRef.current = latest.current.scene.id
           setReady(true)
         },
@@ -140,25 +215,33 @@ export function PanoramaStage({
   useEffect(() => {
     const viewer = viewerRef.current
     const markers = markersRef.current
+
     if (!ready || !viewer || !markers) return
     if (loadedSceneRef.current === scene.id) return
 
     loadedSceneRef.current = scene.id
     markers.clearMarkers()
+
     latest.current.onLoadingChange?.(true)
 
     viewer
       .setPanorama(scene.image, {
-        transition: { speed: TRANSITION_MS, rotation: false, effect: 'fade' },
+        transition: {
+          speed: TRANSITION_MS,
+          rotation: false,
+          effect: 'fade',
+        },
         showLoader: false,
         ...(scene.initialYaw !== undefined && {
-          position: { yaw: toRadians(scene.initialYaw), pitch: 0 },
+          position: {
+            yaw: toRadians(scene.initialYaw),
+            pitch: 0,
+          },
         }),
       })
       .then((completed) => {
-        // `false` means a newer navigation interrupted this one.
         if (completed && loadedSceneRef.current === scene.id) {
-          renderLinks(markers, scene, latest.current.sceneNames)
+          renderMarkers(markers, scene, latest.current.sceneNames)
         }
       })
       .catch((error: unknown) => {

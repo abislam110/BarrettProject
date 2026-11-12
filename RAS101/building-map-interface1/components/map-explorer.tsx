@@ -7,6 +7,8 @@ import { Sidebar } from './sidebar/sidebar'
 import { MapCanvas } from './map/map-canvas'
 import { AddPinDialog, type NewPinData } from './map/add-pin-dialog'
 
+
+
 /**
  * Top-level client component. Owns all shared UI state (selection, search
  * query, pin placement) and wires the sidebar and map together. The 360° tour
@@ -116,6 +118,8 @@ export function MapExplorer({ building }: { building: Building }) {
           onClose={() => setDraftCoords(null)}
         />
       )}
+
+      
     </main>
   )
 }
