@@ -74,13 +74,13 @@ export const building: Building = {
         ],
   hotspots: [
     {
-      id: 'franc-cobot',
-      title: 'FRANUC Cobot',
+      id: 'fanuc-cobot',
+      title: 'FANUC Cobot',
       description:
-        'The FRANUC Cobot is a collaborative robot used in the lab for various tasks and demonstrations.',
+        'The FANUC Cobot is a collaborative robot used in the lab for various tasks and demonstrations.',
       yaw: 285,
       pitch: 355,
-      image: '/thumbnails/lobby.png',
+      videoUrl: '/thumbnails/fanuc-yellow.mp4',
     },
   ],
       },
@@ -141,13 +141,13 @@ export const building: Building = {
         ],
         hotspots: [
     {
-      id: 'cobots',
+      id: 'FANUC CRX Cobots',
       title: 'Cobots',
       description:
-        'Collaborative robots used in the lab for various tasks and demonstrations.',
+        'Collaborative robots made by FANUC used in the lab for various tasks and demonstrations.',
       yaw: 240,
       pitch: 355,
-      image: '',
+      videoUrl: '/thumbnails/fanuc-crx.mp4',
     },
     
     {
@@ -157,7 +157,7 @@ export const building: Building = {
         'A humanoid robot used in the lab for various tasks and demonstrations.',
       yaw: 280,
       pitch: 355,
-      image: '',
+      videoUrl: '/thumbnails/humanoid-robot.mp4',
     },
   ],
   
