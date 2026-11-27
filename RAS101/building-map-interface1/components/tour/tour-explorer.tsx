@@ -157,6 +157,7 @@ export function TourExplorer({ building, initialSceneId }: TourExplorerProps) {
       )}
 
               
+             {/*         
               <div className="pointer-events-none absolute inset-x-0 bottom-12 z-20 flex flex-col gap-3 p-3 md:flex-row md:items-end">
                     <div className="pointer-events-auto hidden w-60 shrink-0 rounded-xl bg-card/95 p-2 shadow-lg ring-1 ring-border backdrop-blur md:block">
                       <TourMinimap
@@ -166,7 +167,37 @@ export function TourExplorer({ building, initialSceneId }: TourExplorerProps) {
                         heading={heading}
                         onSelect={navigate}
                       />
+                                          </div>
 
+                    <nav
+                      aria-label="Tour scenes"
+                      className="pointer-events-auto min-w-0 overflow-x-auto rounded-xl bg-card/95 p-1.5 shadow-lg ring-1 ring-border backdrop-blur md:mx-auto"
+                    >
+                      <ul className="flex gap-1">
+                        {scenes.map((s) => {
+                          const isCurrent = s.id === scene.id
+                          return (
+                            <li key={s.id}>
+                              <button
+                                type="button"
+                                onClick={() => navigate(s.id)}
+                                aria-current={isCurrent ? 'location' : undefined}
+                                className={cn(
+                                  'whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                                  isCurrent
+                                    ? 'bg-primary text-primary-foreground'
+                                    : 'text-card-foreground hover:bg-accent',
+                                )}
+                              >
+                                {s.name}
+                              </button>
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    </nav>
+                  </div> 
+                   */}
     </main>
   )
 }
